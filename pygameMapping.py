@@ -5,56 +5,44 @@ Course : Olin Software Design Fall 2016
 Date   : 2016-10-24
 License: MIT LICENSE
 """
-
+import csv
 import pygame
 
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 
-
-class Ball(object):
-    def __init__(self):
-        self.radius = 20
-        self.reset()
-
-    def step(self):
-        self.y += self.dy
-        self.dy += .08
-        if self.y > 480 - self.radius and self.dy > 0:
-            self.dy *= -1
-        self.dy *= 0.99
-
-    def reset(self):
-        self.x = 320
-        self.y = 240
-        self.dy = 0
-
-    def contains_pt(self, pt):
-        return (self.x - pt[0]) ** 2 + (self.y - pt[1]) ** 2 < self.radius ** 2
+"""
+with open('country_centroids_primary.csv', 'rb') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+    for row in reader:
+        print(type(row))
+        print('\t'.join(row))
+"""
 
 
-class BallView(object):
+class Point(object):
+        def __init__(self):
+            self.radius = 10
+            self.language = 1
+            self.name = 1
+            self.x = 320
+            self.y = 240
+
+        def reset(self):
+            self.x = 320
+            self.y = 240
+
+
+class PointView(object):
     def __init__(self, model):
         self.model = model
 
     def draw(self, surface):
         model = self.model
-        pygame.draw.circle(surface, BLUE, (model.x, int(model.y)), model.radius)
+        pygame.draw.circle(surface, BLUE, ((int(model.x)), int(model.y)), model.radius)
 
 
-class BallEnergyView(object):
-    def __init__(self, model):
-        self.model = model
-
-    def draw(self, surface):
-        model = self.model
-        ke = model.dy ** 2
-        pe = (480 - model.y) ** 2
-        pygame.draw.line(surface, BLUE, (10, 480), (10, 480 - int(ke * 20)), 20)
-        pygame.draw.line(surface, BLUE, (40, 480), (40, 480 - int(pe / 10)), 20)
-
-
-class BounceController(object):
+class PointController(object):
     def __init__(self, models):
         self.models = models
 
@@ -68,26 +56,6 @@ class BounceController(object):
             for model in self.models:
                 model.reset()
 
-
-class Point(object):
-        def __init__(self):
-            self.radius = 20
-            
-            self.reset()
-
-        def reset(self):
-            self.x = 320
-            self.y = 240
-
-
-class PointView(object):
-    def __init__(self, model):
-        self.model = model
-
-    def draw(self, surface):
-        model = self.model
-        pygame.draw.circle(surface, BLUE, (model.x, int(model.y)), model.radius)
-
 class Background(pygame.sprite.Sprite):
     def __init__(self, image_file, location):
         pygame.sprite.Sprite.__init__(self)  # call Sprite initializer
@@ -100,14 +68,18 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((2000, 1075))
 
-    ball = Ball()
-    models = [ball]
+    # ball = Ball()
+    point = Point()
+    # models = [ball]
+    models = [point]
 
     views = []
-    views.append(BallView(ball))
-    views.append(BallEnergyView(ball))
+    # views.append(BallView(ball))
+    views.append(PointView(point))
+    # views.append(BallEnergyView(ball))
     BackGround = Background('/home/sam/Documents/softDes/InteractiveProgramming/InteractiveProgramming/map.png', [0,0])
-    controller = BounceController([ball])
+    # controller = BounceController([ball])
+    controller = PointController([point])
 
     running = True
     while running:
@@ -117,7 +89,8 @@ def main():
                 running = False
 
         for model in models:
-            model.step()
+            # model.step()
+            model.reset()
 
         screen.fill(BLACK)
         screen.fill([255, 255, 255])
