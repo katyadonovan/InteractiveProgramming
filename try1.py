@@ -112,7 +112,7 @@ class PointController(object):
     def __init__(self, models):
         self.models = models
 
-    def handle_event(self, event):
+    def handle_event(self, event,screen):
         # if event.type == pygame.MOUSEBUTTONDOWN:
         #     for model in self.models:
         #         if model.contains_pt(pygame.mouse.get_pos()):
@@ -125,19 +125,19 @@ class PointController(object):
             (x,y) = pygame.mouse.get_pos()
             for model in self.models:
                 for i in range(len(self.models)):
-                    # print('x')
-                    # print(x)
-                    # print(2000-x)
+                    print('x')
+                    print(x)
+                    print(2000-x)
                     x = 2000-x
-                    # print(model[i].x)
-                    # print('y')
-                    # print(y)
-                    # print(model[i].y)
+                    print(model[i].x)
+                    print('y')
+                    print(y)
+                    print(model[i].y)
                     if x-350 < model[i].x <x+350:
                         #print('cat')
                         if  y-350 < model[i].y <y+350:
                             print('dog')
-                            TextView.display(model[i])
+                            TextView(model[i]).display(screen)
                             #path1
 
 class Rect(pygame.sprite.Sprite):
@@ -148,8 +148,8 @@ class Rect(pygame.sprite.Sprite):
         # self.rect.left, self.rect.top = location
 
 class TextView(object):
-    def __init__(self,model):
-        self.model = model
+    def __init__(self,point):
+        self.point = point
         # self.y = 10
         # self.x = 20
         # self.color = fill(WHITE)
@@ -159,17 +159,30 @@ class TextView(object):
     from 1:30 -3 but you can probably come hang out with me if you want outside cause no one will probs show up
     PSA: im saying pygame.Surface, but I think Surface has to be a legit suface. I wanted to call in the screen or recreate it within this class, but it was fuckity;
     We might want to go to a ninja!"""
-    def display(self):
-        pygame.font.init()
-        default_font = pygame.font.get_default_font()
-        font_renderer = pygame.font.Font(default_font, 12)
-        label = font_renderer.render(self.name, 1, (0,0,0))
+
+    def display(self,screen):
+        # pygame.font.init()
+        # default_font = pygame.font.get_default_font()
+        # font_renderer = pygame.font.Font(default_font, 12)
+        # label = font_renderer.render(self.name, 1, (0,0,0))
         # Rect = Rect('text.png', self.x, self.y)
         # pygame.Surface.blit(Rect.image, Rect.rect)
         #Rect=Rect('text.png')
-        print(label)
+        #print(label)
         #TODO: Surface isnt legit?
-        pygame.Surface.blit(label,(self.x,self.y))
+        print('cat')
+        #screen = pygame.display.set_mode((2000, 1075))
+        print('a')
+        rect_surface = pygame.Surface((100, 100)) # create rectangular surface 100x500
+        print(type(rect_surface))
+        screen.blit(rect_surface, (self.point.x, self.point.y)) # draw rectangular surface on your screen
+        #pygame.display.update()
+        rect_surface.fill(BLUE) # fill surface with color (different that screen color)
+        font = pygame.font.SysFont("monospace", 15) # set up font style
+        label = font.render(self.point.name, 1, WHITE) # render font with color (different than rect_surface)
+        rect_surface.blit(label, (5, 5)) # draw font object on rect_surface (should look like text box on screren)
+        pygame.display.update()
+        # pygame.Surface.blit(label,(self.x,self.y))
 
 class Background(pygame.sprite.Sprite):
     def __init__(self, image_file, location):
@@ -206,7 +219,7 @@ def main():
     running = True
     while running:
         for event in pygame.event.get():
-            controller.handle_event(event)
+            controller.handle_event(event, screen)
             if event.type == pygame.QUIT:
                 running = False
 
