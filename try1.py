@@ -127,7 +127,7 @@ class PointController(object):
                 for i in range(len(self.models)):
                     print('x')
                     print(x)
-                    print(2000-x)
+                    #print(2000-x)
                     x = 2000-x
                     print(model[i].x)
                     print('y')
@@ -194,7 +194,7 @@ class Background(pygame.sprite.Sprite):
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((2000, 1075))
+    screen = pygame.display.set_mode((1470, 735))
 
     # ball = Ball()
     points = []
@@ -212,7 +212,7 @@ def main():
         views.append(PointView(points[i]))
     # views.append(BallEnergyView(ball))
     #print(views)
-    BackGround = Background('map.png', [0,0])
+    BackGround = Background('world-map.jpg', [0,0])
     # controller = BounceController([ball])
     controller = PointController([points])
 
