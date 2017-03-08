@@ -59,7 +59,9 @@ final_df =pd.DataFrame(dicts)
 #print(final_df.head())
 #print(list(final_df.rows.values))
 lang1 = list(final_df.iloc[0])
+print(lang1)
 lang2 = list(final_df.iloc[1])
+print(lang2)
 lang3 = list(final_df.iloc[2])
 lat = list(final_df.iloc[3])
 lon = list(final_df.iloc[4])
@@ -74,15 +76,7 @@ print(lat)
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
-
-"""
-with open('country_centroids_primary.csv', 'rb') as csvfile:
-    reader = csv.reader(csvfile, delimiter=',', quotechar='|')
-    for row in reader:
-        print(type(row))
-        print('\t'.join(row))
-"""
-
+YELLOW = (255, 255, 0)
 
 class Point(object):
         def __init__(self,lat,lon,name,lang1,lang2,lang3):
@@ -106,63 +100,28 @@ class PointView(object):
 
     def draw(self, surface):
         model = self.model
-        #print(model.x)
-        pygame.draw.circle(surface, BLUE, ((int(model.x)), int(model.y)), model.radius)
-
-
-class PointController(object):
-    def __init__(self, models):
-        self.models = models
-
-    def handle_event(self, event, screen):
-        # if event.type == pygame.MOUSEBUTTONDOWN:
-        #     for model in self.models:
-        #         if model.contains_pt(pygame.mouse.get_pos()):
-        #             model.reset()
-        #             break
-        if event.type == pygame.KEYDOWN:
-            for model in self.models:
-                model.reset()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            (x,y) = pygame.mouse.get_pos()
-            print(self.models)
-            for model in range(len(self.models)):
-                print(model)
-                print('x')
-                print(x)
-                #print(2000-x)
-                #x = 1470-x
-                print(self.models[model].x)
-                print('y')
-                print(y)
-                print(self.models[model].y)
-                if x-5 < self.models[model].x <x+5:
-                    print('cat')
-                    if  y-5 < self.models[model].y <y+5:
-                        print('dog')
-                        TextView(self.models[model]).display(screen)
-            #path1
+        pygame.draw.circle(surface, YELLOW, ((int(model.x)), int(model.y)), model.radius)
 
 
 class texts(object):
     def __init__(self):
-        self.name = "Hello"
-        self.x = 0
-        self.y = 0
+        self.name = ""
+        self.x = -1000
+        self.y = -1000
         text1 = pygame.font.Font("freesansbold.ttf", 60)
         self.TextSurf, self.TextRect = self.text_objects(self.name, text1)
 
     def text_objects(self, text, font):
+        # print(text)
         textSurface = font.render(text, True, (255, 255, 255))
         return textSurface, textSurface.get_rect()
 
     def reset(self, text, x, y, screen):
         self.x = x
-        self.y = y
-        print("text happening fam")
-        text1 = pygame.font.Font("freesansbold.ttf", 60)
+        self.y = y + 5
+        text1 = pygame.font.Font("freesansbold.ttf", 24)
         self.TextSurf, self.TextRect = self.text_objects(text, text1)
-        self.TextRect.center = (self.x, self.y)
+        self.TextRect.topleft = (self.x, self.y)
 
     def draw(self, screen):
         screen.blit(self.TextSurf, self.TextRect)
@@ -183,7 +142,6 @@ class infoButton(object):
         self.x = -20
         self.y = -20
         self.name = "No Country Selected"
-        # self.txt = texts()
 
         # resets based on mouse position.
     def reset(self, txt, x, y, screen):
@@ -206,25 +164,40 @@ class ButtonController(object):
 
     def handle_mouse_event(self, event, screen,models):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            (x,y) = pygame.mouse.get_pos()
+            (x, y) = pygame.mouse.get_pos()
             print(models)
             for i in range(len(models)):
-                print(i)
-                print('x')
-                print(x)
-                #print(2000-x)
-                #x = 1470-x
-                print(models[i].x)
-                print('y')
-                print(y)
-                print(models[i].y)
-                if x-5 < models[i].x <x+5:
+                if x-5 < models[i].x < x+5:
                     print('cat')
-                    if  y-5 < models[i].y <y+5:
+                    if y-5 < models[i].y < y+5:
                         print('dog')
                         pos = pygame.mouse.get_pos()
                         self.model.reset(models[i].name, pos[0], pos[1], screen)
-        # self.model.txt.rest(x, y, self.model.infotxt, screen)
+
+
+class LangController(object):
+    def __init__(self, model):
+        self.model = model
+
+    def handle_mouse_event(self, event, screen, models, lan):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            (x, y) = pygame.mouse.get_pos()
+            print(models)
+            for i in range(len(models)):
+                if x-5 < models[i].x < x+5:
+                    print('cat')
+                    if y-5 < models[i].y < y+5:
+                        print('dog')
+                        pos = pygame.mouse.get_pos()
+                        if lan == 3:
+                            self.model.reset(models[i].lang3, pos[0], pos[1] + 15, screen)
+                        elif lan == 2:
+                            print(lan)
+                            self.model.reset(models[i].lang2, pos[0], pos[1] + 15, screen)
+                        else:
+                            print(lan)
+                            self.model.reset(models[i].lang1, pos[0], pos[1] + 15, screen)
+
 
 
 class Rect(pygame.sprite.Sprite):
@@ -240,12 +213,6 @@ class TextView(object):
         # self.y = 10
         # self.x = 20
         # self.color = fill(WHITE)
-    """SAM YOUNG: TODO: So this is called from path1 (search path1) and it is supposed to create a label (honestly anything could work:)
-    I got the standard font and created a surface object, but keep getting an error saying the first argyment is not a surface. If you get it working, want to also try
-    creating a text box to put the label? But that doesn't matter as much. I dont know if you want to save the code in a different file so we dont get merge conflicts? I have shobot
-    from 1:30 -3 but you can probably come hang out with me if you want outside cause no one will probs show up
-    PSA: im saying pygame.Surface, but I think Surface has to be a legit suface. I wanted to call in the screen or recreate it within this class, but it was fuckity;
-    We might want to go to a ninja!"""
 
     def display(self,screen):
         # pygame.font.init()
@@ -271,6 +238,7 @@ class TextView(object):
         pygame.display.update()
         # pygame.Surface.blit(label,(self.x,self.y))
 
+
 class Background(pygame.sprite.Sprite):
     def __init__(self, image_file, location):
         pygame.sprite.Sprite.__init__(self)  # call Sprite initializer
@@ -284,6 +252,7 @@ def main():
     screen = pygame.display.set_mode((1470, 735))
     button = infoButton()
     infot = texts()
+    lang = texts()
     points = []
     for i in range(len(lon)):
         point = Point(lat[i],lon[i],real_countries[i],lang1[i],lang2[i],lang3[i])
@@ -295,18 +264,31 @@ def main():
 
     views.append(infoButtonView(button))
     views.append(infoTextView(infot))
+    views.append(infoTextView(lang))
     BackGround = Background('world-map.jpg', [0,0])
-    controller = PointController(points)
+    # controller = PointController(points)
     button_controller = ButtonController(button)
     button_controller2 = ButtonController(infot)
+    lang_controller = LangController(lang)
     text1 = texts()
     running = True
     while running:
         for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    lan = 1
+                elif event.key == pygame.K_2:
+                    lan = 2
+                elif event.key == pygame.K_3:
+                    lan = 3
+                else:
+                    lan = 1
             if event.type == pygame.MOUSEBUTTONDOWN:
                 #controller.handle_event(event, screen)
                 button_controller.handle_mouse_event(event, screen, models)
                 button_controller2.handle_mouse_event(event, screen, models)
+                lang_controller.handle_mouse_event(event, screen, models, lan)
+
             if event.type == pygame.QUIT:
                 running = False
 
@@ -318,11 +300,12 @@ def main():
         screen.fill(BLACK)
         screen.fill([255, 255, 255])
         screen.blit(BackGround.image, BackGround.rect)
+        views.append(text1)
+        text1.reset("Languages of the World",1470/2 - 300, 20, screen)
         for view in views:
             #print('dog')
             #print(view)
             view.draw(screen)
-        # text1.reset("Languages of the World",1470/2, 65, screen)
         pygame.display.update()
 
     pygame.quit()
