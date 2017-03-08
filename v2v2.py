@@ -14,16 +14,16 @@ a= my_dic_first_language['Dari Persian']
 b = my_dic_second_language['Pashtu']
 c = my_dic_third_language['Turkic']
 
-country = pd.read_excel(open('country_centroids_all2.xlsx', 'rb'), parse_cols = "A")
-position =  pd.read_excel('country_centroids_all2.xlsx', index_col=0, parse_cols = "A,G").to_dict()
-position2 = pd.read_excel('country_centroids_all2.xlsx', index_col=0, parse_cols = "A,F").to_dict()
+country = pd.read_excel(open('pleasework.xlsx', 'rb'), parse_cols = "A")
+position =  pd.read_excel('pleasework.xlsx', index_col=0, parse_cols = "A,D").to_dict()
+position2 = pd.read_excel('pleasework.xlsx', index_col=0, parse_cols = "A,E").to_dict()
 
 d =  position['LAT2']
 h = position2['LONG2']
 
 ps = pd.read_excel('data2.xlsx')
 f=ps.iloc[:,0].tolist()
-cd = pd.read_excel('country_centroids_all2.xlsx')
+cd = pd.read_excel('pleasework.xlsx')
 e=cd.iloc[:,0].tolist()
 
 real_countries = []
@@ -39,6 +39,7 @@ new_second = {}
 new_third = {}
 new_pos = {}
 new_pos2 = {}
+
 
 def common_dicts(dict1,dict2,lst):
     for k,v in dict1.items():
@@ -62,6 +63,7 @@ lang2 = list(final_df.iloc[1])
 lang3 = list(final_df.iloc[2])
 lat = list(final_df.iloc[3])
 lon = list(final_df.iloc[4])
+print(lat)
 #print(lon)
 #print(real_countries)
     #return final_df
