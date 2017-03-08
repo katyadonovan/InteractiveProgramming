@@ -56,6 +56,7 @@ new5 = common_dicts(h,new_pos2,real_countries)
 dicts = [new1,new2,new3,new4,new5]
 
 final_df =pd.DataFrame(dicts)
+final_df.fillna(value='None',inplace = True)
 #print(final_df.head())
 #print(list(final_df.rows.values))
 lang1 = list(final_df.iloc[0])
@@ -213,7 +214,7 @@ class TextView(object):
         # self.y = 10
         # self.x = 20
         # self.color = fill(WHITE)
-
+"""
     def display(self,screen):
         # pygame.font.init()
         # default_font = pygame.font.get_default_font()
@@ -236,8 +237,7 @@ class TextView(object):
         label = font.render(self.point.name, 1, WHITE) # render font with color (different than rect_surface)
         rect_surface.blit(label, (5, 5)) # draw font object on rect_surface (should look like text box on screren)
         pygame.display.update()
-        # pygame.Surface.blit(label,(self.x,self.y))
-
+"""
 
 class Background(pygame.sprite.Sprite):
     def __init__(self, image_file, location):
@@ -266,7 +266,6 @@ def main():
     views.append(infoTextView(infot))
     views.append(infoTextView(lang))
     BackGround = Background('world-map.jpg', [0,0])
-    # controller = PointController(points)
     button_controller = ButtonController(button)
     button_controller2 = ButtonController(infot)
     lang_controller = LangController(lang)
