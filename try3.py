@@ -174,7 +174,7 @@ class infoButton(object):
 
 class infoButtonView(object):
     def __init__(self, model):
-        self.model = model
+        self.model = models
 
     def draw(self, surface):
         pygame.draw.rect(surface, (255, 255, 200), (self.model.x, self.model.y, self.model.len, self.model.height), 0)
@@ -211,14 +211,7 @@ class TextView(object):
     We might want to go to a ninja!"""
 
     def display(self,screen):
-        # pygame.font.init()
-        # default_font = pygame.font.get_default_font()
-        # font_renderer = pygame.font.Font(default_font, 12)
-        # label = font_renderer.render(self.name, 1, (0,0,0))
-        # Rect = Rect('text.png', self.x, self.y)
-        # pygame.Surface.blit(Rect.image, Rect.rect)
-        #Rect=Rect('text.png')
-        #print(label)
+
         #TODO: Surface isnt legit?
         print('cat')
         #screen = pygame.display.set_mode((2000, 1075))
@@ -270,17 +263,11 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        # for point in models:
-            # model.step()
-            #print(type(point))
-            # point.reset()
-
         screen.fill(BLACK)
         screen.fill([255, 255, 255])
         screen.blit(BackGround.image, BackGround.rect)
         for view in views:
-            #print('dog')
-            #print(view)
+
             view.draw(screen)
         text1.reset("hi", screen)
         pygame.display.update()
