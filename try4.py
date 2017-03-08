@@ -159,18 +159,18 @@ class texts(object):
 
 class infoButton(object):
     def __init__(self):
-        self.len = 20
-        self.height = 20
+        self.len = 50
+        self.height = 30
         self.x = 20
         self.y = 20
-        self.infotxt = "No Country Selected"
+        self.name = "No Country Selected"
         # self.txt = texts()
 
         # resets based on mouse position.
     def reset(self, x, y):
         self.x = x
         self.y = y
-        self.infotext = "No Country Selected"
+        self.name = "No Country Selected"
 
 
 class infoButtonView(object):
