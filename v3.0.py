@@ -1,3 +1,10 @@
+"""This is an interactive data visualization map that allows users to determine the most common spoken languages for countries around the world.
+TO BEGIN: Press on any key, and then click on any of the points. If you would like to see the most common language for that specifc country, click on its
+centroid and click on any key other than 2 and 3. For second and third most common languages, click on 2 and 3.
+
+PSA: Our files kept getting corrupted once we pulled them from git. If this happens to you then email us and we will send you the correct file via email.
+Have fun and thank you!  """
+
 import csv
 import pygame
 import pandas as pd
@@ -6,15 +13,17 @@ import xlrd
 import math
 
 #def processing_data():
-
+#reading the data and turning the country and language (either most spoken, second most spoken or third most spoken) into a dictionary
 my_dic_first_language = pd.read_excel('data2.xlsx', index_col=0, parse_cols = "A:B").to_dict()
 my_dic_second_language = pd.read_excel('data2.xlsx', index_col=0, parse_cols = "A,C").to_dict()
 my_dic_third_language = pd.read_excel('data2.xlsx', index_col=0, parse_cols = "A,D").to_dict()
 
+#finding value of the these values in order to reach the dictionary, the dictionary was returned within a dictionary
 a = my_dic_first_language['Dari Persian']
 b = my_dic_second_language['Pashtu']
 c = my_dic_third_language['Turkic']
 
+#reading the data for longitude and latitude for each country from a different source
 country = pd.read_excel(open('bleh.xlsx', 'rb'), parse_cols = "A")
 position = pd.read_excel('bleh.xlsx', index_col=0, parse_cols = "A,D").to_dict()
 position2 = pd.read_excel('bleh.xlsx', index_col=0, parse_cols = "A,E").to_dict()
@@ -22,11 +31,11 @@ position2 = pd.read_excel('bleh.xlsx', index_col=0, parse_cols = "A,E").to_dict(
 d = position['LAT2']
 h = position2['LONG2']
 
+#creates list of the first column (or the countries) for both sources
 ps = pd.read_excel('data2.xlsx')
-f = ps.iloc[:, 0].tolist()
 cd = pd.read_excel('bleh.xlsx')
-e = cd.iloc[:, 0].tolist()
 
+#compares both lists of countries and appends a list of the common countries
 real_countries = []
 for i in cd.iloc[:, 0].tolist():
     if i in ps.iloc[:, 0].tolist():
@@ -35,13 +44,14 @@ for i in ps.iloc[:, 0].tolist():
     if i in cd.iloc[:, 0].tolist():
         real_countries.append(i)
 
+#creates five new dictionaries for the three languages and the position as values and countries as keys
 new_first = {}
 new_second = {}
 new_third = {}
 new_pos = {}
 new_pos2 = {}
 
-
+#a function that returns a dictionary of values of a dictionary
 def common_dicts(dict1, dict2, lst):
     for k, v in dict1.items():
         for i in lst:
@@ -49,6 +59,7 @@ def common_dicts(dict1, dict2, lst):
                 dict2[k] = v
     return dict2
 
+#crreates a dictionary of keys that were in the countries list
 new1= common_dicts(a,new_first,real_countries)
 new2 = common_dicts(b,new_second,real_countries)
 new3 = common_dicts(c,new_third,real_countries)
@@ -56,6 +67,7 @@ new4 = common_dicts(d,new_pos,real_countries)
 new5 = common_dicts(h,new_pos2,real_countries)
 dicts = [new1,new2,new3,new4,new5]
 
+#puts the list of dicts into a dataframe and then returns a list of each of the categories
 final_df =pd.DataFrame(dicts)
 final_df.fillna(value='None',inplace = True)
 lang1 = list(final_df.iloc[0])
@@ -64,7 +76,7 @@ lang3 = list(final_df.iloc[2])
 lat = list(final_df.iloc[3])
 lon = list(final_df.iloc[4])
 
-
+# making variables for colors
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
@@ -77,6 +89,7 @@ LANG3 = (26,162,94)
 TITLE = (0,0,0)
 COUNTRY = (255,255,255)
 
+#creates a point class that stores information about point objects
 class Point(object):
         def __init__(self,lat,lon,name,lang1,lang2,lang3):
             self.radius = 5
@@ -92,7 +105,7 @@ class Point(object):
             self.x = lat
             self.y = lon
 
-
+#draws the point objects when passed through
 class PointView(object):
     def __init__(self, model):
         self.model = model
@@ -101,7 +114,7 @@ class PointView(object):
         model = self.model
         pygame.draw.circle(surface, LIGHTBLUE, ((int(model.x)), int(model.y)), model.radius)
 
-
+#creates a model class for text objects that stores data for each text object such as font, color, size
 class texts(object):
     def __init__(self):
         self.name = ""
@@ -125,7 +138,7 @@ class texts(object):
     def draw(self, screen):
         screen.blit(self.TextSurf, self.TextRect)
 
-
+#a class that draws the texts out
 class infoTextView(object):
     def __init__(self, model):
         self.model = model
@@ -133,43 +146,7 @@ class infoTextView(object):
     def draw(self, surface):
         self.model.draw(surface)
 
-
-class infoButton(object):
-    def __init__(self):
-        self.len = 140
-        self.height = 60
-        self.x = -200
-        self.y = -200
-        self.name = "No Country Selected"
-
-        # resets based on mouse position.
-    def reset(self, txt, x, y, screen,size,color):
-        self.x = x
-        self.y = y
-        self.name = "No Country Selected"
-
-
-class infoButtonView(object):
-    def __init__(self, model):
-        self.model = model
-
-    def draw(self, surface):
-        pygame.draw.rect(surface, (0, 0, 0), (self.model.x, self.model.y, self.model.len, self.model.height), 0)
-
-class ButtonController(object):
-    def __init__(self, model):
-        self.model = model
-
-    def handle_mouse_event(self, event, screen,models):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            (x, y) = pygame.mouse.get_pos()
-            for i in range(len(models)):
-                if x-5 < models[i].x < x+5:
-                    if y-5 < models[i].y < y+5:
-                        pos = pygame.mouse.get_pos()
-                        self.model.reset(models[i].name, pos[0], pos[1], screen, 20, COUNTRY)
-
-
+#a class that acts a controller for writing the languages of each of countries by stating the a different language depending on which box is pressed
 class LangController(object):
     def __init__(self, model):
         self.model = model
@@ -188,18 +165,44 @@ class LangController(object):
                         else:
                             self.model.reset(models[i].lang1, pos[0], pos[1] + 25, screen,20,LANG1)
 
+# a class that stores information about the text box that contains the text
+class infoBox(object):
+    def __init__(self):
+        self.len = 140
+        self.height = 60
+        self.x = -200
+        self.y = -200
+        self.name = "No Country Selected"
 
+        # resets based on mouse position.
+    def reset(self, txt, x, y, screen,size,color):
+        self.x = x
+        self.y = y
+        self.name = "No Country Selected"
 
-class Rect(pygame.sprite.Sprite):
-    def __init__(self, image_file):
-        pygame.sprite.Sprite.__init__(self)  # call Sprite initializer
-        self.image = pygame.image.load(image_file)
-        self.rect = self.image.get_rect()
+# a class that draws out the box and affects the view
+class infoBoxView(object):
+    def __init__(self, model):
+        self.model = model
 
-class TextView(object):
-    def __init__(self,point):
-        self.point = point
+    def draw(self, surface):
+        pygame.draw.rect(surface, (0, 0, 0), (self.model.x, self.model.y, self.model.len, self.model.height), 0)
 
+# a class that controls where the box moves to depending on where on the map is clicked
+class BoxController(object):
+    def __init__(self, model):
+        self.model = model
+
+    def handle_mouse_event(self, event, screen,models):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            (x, y) = pygame.mouse.get_pos()
+            for i in range(len(models)):
+                if x-5 < models[i].x < x+5:
+                    if y-5 < models[i].y < y+5:
+                        pos = pygame.mouse.get_pos()
+                        self.model.reset(models[i].name, pos[0], pos[1], screen, 20, COUNTRY)
+
+# a class that changes the background image of the screen
 class Background(pygame.sprite.Sprite):
     def __init__(self, image_file, location):
         pygame.sprite.Sprite.__init__(self)  # call Sprite initializer
@@ -207,14 +210,23 @@ class Background(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = location
 
-
 def main():
+    # initiating the game and creating the background
     pygame.init()
     screen = pygame.display.set_mode((1470, 735))
-    button = infoButton()
-    button1 = infoButton()
+    BackGround = Background('world-map.jpg', [0,0])
+
+    # creates ttext objects and box objects
+    box = infoBox()
+    box1 = infoBox()
     infot = texts()
     lang = texts()
+    text1 = texts()
+    text2 = texts()
+    text3 = texts()
+    text4 = texts()
+
+    # put the points on the screen in a view list
     points = []
     for i in range(len(lon)):
         point = Point(lat[i],lon[i],real_countries[i],lang1[i],lang2[i],lang3[i])
@@ -224,22 +236,18 @@ def main():
     for i in range(len(points)):
         views.append(PointView(points[i]))
 
-    views.append(infoButtonView(button))
+    # initializes the box and both texts onto the screen (off screen)
+    views.append(infoBoxView(box))
     views.append(infoTextView(infot))
     views.append(infoTextView(lang))
-    BackGround = Background('world-map.jpg', [0,0])
-    button_controller = ButtonController(button)
-    button_controller2 = ButtonController(infot)
-    lang_controller = LangController(lang)
-    text1 = texts()
-    text2 = texts()
-    text3 = texts()
-    text4 = texts()
     views.append(text1)
     views.append(text2)
     views.append(text3)
-    views.append(infoButtonView(button1))
+    views.append(infoBoxView(box1))
     views.append(text4)
+
+    # runs the game and depending on which key is pressed will output a different language for each country (keys are 2, 3 and anything else)
+    # if the mouse is clicked, then a box with the country's name will appear
     running = True
     while running:
         for event in pygame.event.get():
@@ -253,13 +261,14 @@ def main():
                 else:
                     lan = 1
             if event.type == pygame.MOUSEBUTTONDOWN:
-                button_controller.handle_mouse_event(event, screen, models)
-                button_controller2.handle_mouse_event(event, screen, models)
-                lang_controller.handle_mouse_event(event, screen, models, lan)
+                BoxController(box).handle_mouse_event(event, screen, models)
+                BoxController(infot).handle_mouse_event(event, screen, models)
+                LangController(lang).handle_mouse_event(event, screen, models, lan)
 
             if event.type == pygame.QUIT:
                 running = False
 
+        # sets up the screen for when the pygame is running
         screen.fill(BLACK)
         screen.fill([255, 255, 255])
         screen.blit(BackGround.image, BackGround.rect)
@@ -268,6 +277,7 @@ def main():
         text3.reset("Second Most Spoken Language: Purple", 40, 735- 100,  screen, 20, LANG2)
         text4.reset("Third Most Spoken Language: Green", 40, 735- 70, screen, 20, LANG3)
 
+        # displays all the initial objects on the screen
         for view in views:
             view.draw(screen)
         pygame.display.update()
