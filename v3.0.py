@@ -287,3 +287,9 @@ def main():
 
 if __name__ == '__main__':
     main()
+"""This is an interactive data visualization map that allows users to determine the most common spoken languages for countries around the world.
+TO BEGIN: Press on any key, and then click on any of the points. If you would like to see the most common language for that specifc country, click on its
+centroid and click on any key other than 2 and 3. For second and third most common languages, click on 2 and 3.
+
+PSA: Our files kept getting corrupted once we pulled them from git. If this happens to you then email us and we will send you the correct file via email.
+Have fun and thank you!  """
