@@ -15,16 +15,16 @@ a = my_dic_first_language['Dari Persian']
 b = my_dic_second_language['Pashtu']
 c = my_dic_third_language['Turkic']
 
-country = pd.read_excel(open('pleasework.xlsx', 'rb'), parse_cols = "A")
-position = pd.read_excel('pleasework.xlsx', index_col=0, parse_cols = "A,D").to_dict()
-position2 = pd.read_excel('pleasework.xlsx', index_col=0, parse_cols = "A,E").to_dict()
+country = pd.read_excel(open('bleh.xlsx', 'rb'), parse_cols = "A")
+position = pd.read_excel('bleh.xlsx', index_col=0, parse_cols = "A,D").to_dict()
+position2 = pd.read_excel('bleh.xlsx', index_col=0, parse_cols = "A,E").to_dict()
 
 d = position['LAT2']
 h = position2['LONG2']
 
 ps = pd.read_excel('data2.xlsx')
 f = ps.iloc[:, 0].tolist()
-cd = pd.read_excel('pleasework.xlsx')
+cd = pd.read_excel('bleh.xlsx')
 e = cd.iloc[:, 0].tolist()
 
 real_countries = []
@@ -71,7 +71,11 @@ WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 LIGHTBLUE = (204, 255, 255)
 ORANGE = (244, 99, 99)
-
+LANG1 = (25,105,152)
+LANG2 = (117,26,162)
+LANG3 = (26,162,94)
+TITLE = (0,0,0)
+COUNTRY = (255,255,255)
 
 class Point(object):
         def __init__(self,lat,lon,name,lang1,lang2,lang3):
@@ -95,7 +99,7 @@ class PointView(object):
 
     def draw(self, surface):
         model = self.model
-        pygame.draw.circle(surface, YELLOW, ((int(model.x)), int(model.y)), model.radius)
+        pygame.draw.circle(surface, LIGHTBLUE, ((int(model.x)), int(model.y)), model.radius)
 
 
 class texts(object):
@@ -103,19 +107,19 @@ class texts(object):
         self.name = ""
         self.x = -1000
         self.y = -1000
+        self.color = BLACK
         text1 = pygame.font.Font("freesansbold.ttf", 60)
-        self.TextSurf, self.TextRect = self.text_objects(self.name, text1)
+        self.TextSurf, self.TextRect = self.text_objects(self.name, text1, self.color)
 
-    def text_objects(self, text, font):
-        # print(text)
-        textSurface = font.render(text, True, (255, 255, 255))
+    def text_objects(self, text, font,color):
+        textSurface = font.render(text, True,color)
         return textSurface, textSurface.get_rect()
 
-    def reset(self, text, x, y, screen):
-        self.x = x
+    def reset(self, text, x, y, screen,size,color):
+        self.x = x + 5
         self.y = y + 5
-        text1 = pygame.font.Font("freesansbold.ttf", 24)
-        self.TextSurf, self.TextRect = self.text_objects(text, text1)
+        text1 = pygame.font.Font("freesansbold.ttf", size)
+        self.TextSurf, self.TextRect = self.text_objects(text, text1, color)
         self.TextRect.topleft = (self.x, self.y)
 
     def draw(self, screen):
@@ -132,18 +136,17 @@ class infoTextView(object):
 
 class infoButton(object):
     def __init__(self):
-        self.len = 60
-        self.height = 30
-        self.x = -20
-        self.y = -20
+        self.len = 140
+        self.height = 60
+        self.x = -200
+        self.y = -200
         self.name = "No Country Selected"
 
         # resets based on mouse position.
-    def reset(self, txt, x, y, screen):
+    def reset(self, txt, x, y, screen,size,color):
         self.x = x
         self.y = y
         self.name = "No Country Selected"
-        print(self.name)
 
 
 class infoButtonView(object):
@@ -160,14 +163,11 @@ class ButtonController(object):
     def handle_mouse_event(self, event, screen,models):
         if event.type == pygame.MOUSEBUTTONDOWN:
             (x, y) = pygame.mouse.get_pos()
-            print(models)
             for i in range(len(models)):
                 if x-5 < models[i].x < x+5:
-                    print('cat')
                     if y-5 < models[i].y < y+5:
-                        print('dog')
                         pos = pygame.mouse.get_pos()
-                        self.model.reset(models[i].name, pos[0], pos[1], screen)
+                        self.model.reset(models[i].name, pos[0], pos[1], screen, 20, COUNTRY)
 
 
 class LangController(object):
@@ -177,21 +177,16 @@ class LangController(object):
     def handle_mouse_event(self, event, screen, models, lan):
         if event.type == pygame.MOUSEBUTTONDOWN:
             (x, y) = pygame.mouse.get_pos()
-            print(models)
             for i in range(len(models)):
                 if x-5 < models[i].x < x+5:
-                    print('cat')
                     if y-5 < models[i].y < y+5:
-                        print('dog')
                         pos = pygame.mouse.get_pos()
                         if lan == 3:
-                            self.model.reset(models[i].lang3, pos[0], pos[1] + 15, screen)
+                            self.model.reset(models[i].lang3, pos[0], pos[1] + 25, screen,20,LANG3)
                         elif lan == 2:
-                            print(lan)
-                            self.model.reset(models[i].lang2, pos[0], pos[1] + 15, screen)
+                            self.model.reset(models[i].lang2, pos[0], pos[1] + 25, screen,20,LANG2)
                         else:
-                            print(lan)
-                            self.model.reset(models[i].lang1, pos[0], pos[1] + 15, screen)
+                            self.model.reset(models[i].lang1, pos[0], pos[1] + 25, screen,20,LANG1)
 
 
 
@@ -200,38 +195,10 @@ class Rect(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)  # call Sprite initializer
         self.image = pygame.image.load(image_file)
         self.rect = self.image.get_rect()
-        # self.rect.left, self.rect.top = location
 
 class TextView(object):
     def __init__(self,point):
         self.point = point
-        # self.y = 10
-        # self.x = 20
-        # self.color = fill(WHITE)
-"""
-    def display(self,screen):
-        # pygame.font.init()
-        # default_font = pygame.font.get_default_font()
-        # font_renderer = pygame.font.Font(default_font, 12)
-        # label = font_renderer.render(self.name, 1, (0,0,0))
-        # Rect = Rect('text.png', self.x, self.y)
-        # pygame.Surface.blit(Rect.image, Rect.rect)
-        #Rect=Rect('text.png')
-        #print(label)
-        #TODO: Surface isnt legit?
-        print('cat')
-        #screen = pygame.display.set_mode((2000, 1075))
-        print('a')
-        rect_surface = pygame.Surface((100, 100)) # create rectangular surface 100x500
-        print(type(rect_surface))
-        screen.blit(rect_surface, (self.point.x, self.point.y)) # draw rectangular surface on your screen
-        #pygame.display.update()
-        rect_surface.fill(BLUE) # fill surface with color (different that screen color)
-        font = pygame.font.SysFont("monospace", 15) # set up font style
-        label = font.render(self.point.name, 1, WHITE) # render font with color (different than rect_surface)
-        rect_surface.blit(label, (5, 5)) # draw font object on rect_surface (should look like text box on screren)
-        pygame.display.update()
-"""
 
 class Background(pygame.sprite.Sprite):
     def __init__(self, image_file, location):
@@ -245,6 +212,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((1470, 735))
     button = infoButton()
+    button1 = infoButton()
     infot = texts()
     lang = texts()
     points = []
@@ -264,6 +232,14 @@ def main():
     button_controller2 = ButtonController(infot)
     lang_controller = LangController(lang)
     text1 = texts()
+    text2 = texts()
+    text3 = texts()
+    text4 = texts()
+    views.append(text1)
+    views.append(text2)
+    views.append(text3)
+    views.append(infoButtonView(button1))
+    views.append(text4)
     running = True
     while running:
         for event in pygame.event.get():
@@ -287,8 +263,11 @@ def main():
         screen.fill(BLACK)
         screen.fill([255, 255, 255])
         screen.blit(BackGround.image, BackGround.rect)
-        views.append(text1)
-        text1.reset("Languages of the World",1470/2 - 300, 20, screen)
+        text1.reset("Languages of the World",1470/2 - 220, 20, screen, 40, BLACK)
+        text2.reset("Most Spoken Language: Blue", 40, 735-130, screen, 20, LANG1)
+        text3.reset("Second Most Spoken Language: Purple", 40, 735- 100,  screen, 20, LANG2)
+        text4.reset("Third Most Spoken Language: Green", 40, 735- 70, screen, 20, LANG3)
+
         for view in views:
             view.draw(screen)
         pygame.display.update()
